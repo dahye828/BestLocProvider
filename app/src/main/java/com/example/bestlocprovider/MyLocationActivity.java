@@ -63,5 +63,27 @@ public class MyLocationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        myLocField = findViewById(R.id.myLocationField);
+        locManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        bestProvName = locManager.getBestProvider(criteria, true);
+
+        locListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                myLocField.setText("Latitude: " + location.getLatitude()
+                        + "\nLongitude: " + location.getLongitude()
+                        + "\nAltitude: " + location.getAltitude());
+
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(MyLocationActivity.this, "first enable LOCATION ACCESS insettings.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
     }
 }
